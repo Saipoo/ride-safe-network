@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { addBooking, updateRide } from '../services/localStorage';
 import { useToast } from '@/hooks/use-toast';
+import { Clock, Star, CarFront } from 'lucide-react';
 
 interface RideListProps {
   rides: Ride[];
@@ -15,6 +16,7 @@ interface RideListProps {
 const RideList: React.FC<RideListProps> = ({ rides, currentUser, onBookingCreated }) => {
   const { toast } = useToast();
   const [sortBy, setSortBy] = useState<'time' | 'price' | 'rating'>('time');
+  const [bookedRideId, setBookedRideId] = useState<string | null>(null);
 
   if (!rides.length) {
     return (
@@ -60,6 +62,7 @@ const RideList: React.FC<RideListProps> = ({ rides, currentUser, onBookingCreate
     updateRide(updatedRide);
     addBooking(newBooking);
     onBookingCreated(newBooking);
+    setBookedRideId(ride.id);
 
     toast({
       title: "Booking Confirmed",
@@ -84,6 +87,7 @@ const RideList: React.FC<RideListProps> = ({ rides, currentUser, onBookingCreate
               variant={sortBy === 'time' ? 'default' : 'outline'}
               onClick={() => setSortBy('time')}
             >
+              <Clock className="h-4 w-4 mr-1" />
               Time
             </Button>
             <Button 
@@ -91,13 +95,14 @@ const RideList: React.FC<RideListProps> = ({ rides, currentUser, onBookingCreate
               variant={sortBy === 'price' ? 'default' : 'outline'}
               onClick={() => setSortBy('price')}
             >
-              Price
+              ₹ Price
             </Button>
             <Button 
               size="sm" 
               variant={sortBy === 'rating' ? 'default' : 'outline'}
               onClick={() => setSortBy('rating')}
             >
+              <Star className="h-4 w-4 mr-1" />
               Rating
             </Button>
           </div>
@@ -106,34 +111,43 @@ const RideList: React.FC<RideListProps> = ({ rides, currentUser, onBookingCreate
       
       <div className="divide-y">
         {sortedRides.map(ride => (
-          <div key={ride.id} className="p-4 hover:bg-muted transition-colors">
+          <div key={ride.id} className={`p-4 transition-colors ${bookedRideId === ride.id ? 'bg-primary-light' : 'hover:bg-muted'}`}>
             <div className="flex items-start justify-between">
               <div>
                 <h3 className="font-medium">{ride.startLocation.address} → {ride.endLocation.address}</h3>
-                <div className="text-sm text-muted-foreground mt-1">
+                <div className="text-sm text-muted-foreground mt-1 flex items-center">
+                  <Clock className="h-4 w-4 mr-1" />
                   {formatDate(ride.departureTime)}
                 </div>
                 <div className="flex items-center gap-2 mt-2">
-                  <Badge variant="outline" className="bg-primary-light">
+                  <Badge variant="outline" className="bg-primary-light flex items-center">
+                    <CarFront className="h-3 w-3 mr-1" />
                     {ride.vehicleType}
                   </Badge>
                   <Badge variant="outline" className="bg-primary-light">
                     {ride.availableSeats} seats available
                   </Badge>
                   <div className="flex items-center text-amber-500">
-                    ★ {ride.riderRating.toFixed(1)}
+                    <Star className="h-4 w-4 mr-0.5 fill-amber-500" />
+                    {ride.riderRating.toFixed(1)}
                   </div>
                 </div>
               </div>
               
               <div className="flex flex-col items-end">
                 <div className="text-lg font-semibold text-primary">₹{ride.pricePerPassenger}</div>
-                <Button 
-                  className="mt-2"
-                  onClick={() => handleBookRide(ride)}
-                >
-                  Book Seat
-                </Button>
+                {bookedRideId === ride.id ? (
+                  <Badge className="mt-2 bg-green-100 text-green-800 border-green-200">
+                    Booked
+                  </Badge>
+                ) : (
+                  <Button 
+                    className="mt-2"
+                    onClick={() => handleBookRide(ride)}
+                  >
+                    Book Seat
+                  </Button>
+                )}
               </div>
             </div>
             

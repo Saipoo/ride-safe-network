@@ -4,6 +4,7 @@ import { UserMode } from '../types';
 import { Button } from '@/components/ui/button';
 import { setUserMode } from '../services/localStorage';
 import { useToast } from '@/hooks/use-toast';
+import { MapPin, Users } from 'lucide-react';
 
 interface AppHeaderProps {
   currentMode: UserMode | null;
@@ -35,9 +36,9 @@ const AppHeader: React.FC<AppHeaderProps> = ({ currentMode, onModeChange, onLogo
       <div className="container mx-auto px-4 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <div className="h-8 w-8 bg-primary rounded-full flex items-center justify-center">
-            <span className="text-white font-bold">R</span>
+            <Users className="h-5 w-5 text-white" />
           </div>
-          <h1 className="text-xl font-bold text-primary">ride with us</h1>
+          <h1 className="text-xl font-bold text-primary">carpooling</h1>
         </div>
         
         <div className="flex items-center gap-4">

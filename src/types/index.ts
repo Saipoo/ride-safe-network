@@ -34,6 +34,7 @@ export interface Ride {
   status: 'scheduled' | 'in-progress' | 'completed' | 'cancelled';
   passengers: string[]; // passenger IDs
   createdAt: string;
+  currentLocation?: Location; // For live tracking
 }
 
 export interface Booking {
@@ -43,8 +44,9 @@ export interface Booking {
   passengerName: string;
   pickupLocation: Location;
   dropoffLocation: Location;
-  status: 'pending' | 'confirmed' | 'cancelled' | 'completed';
+  status: 'pending' | 'confirmed' | 'in-progress' | 'cancelled' | 'completed';
   createdAt: string;
+  otp?: string; // For ride verification
 }
 
 export interface EmergencyVehicle {

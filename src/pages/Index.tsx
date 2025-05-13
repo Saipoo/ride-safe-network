@@ -4,9 +4,9 @@ import AppHeader from '../components/AppHeader';
 import Login from '../components/Login';
 import RideForm from '../components/RideForm';
 import RideList from '../components/RideList';
+import RideTracker from '../components/RideTracker';
 import EmergencySimulation from '../components/EmergencySimulation';
 import RideSimulation from '../components/RideSimulation';
-import Map from '../components/Map';
 import { User, Ride, UserMode, Booking, EmergencyVehicle } from '../types';
 import { initializeAppState, setUserMode, generateMockData } from '../services/localStorage';
 
@@ -34,7 +34,7 @@ const Index = () => {
       setCurrentMode(appState.currentMode);
       setRides(appState.rides);
       setBookings(appState.bookings);
-      setEmergencyVehicles(appState.emergencyVehicles);
+      setEmergencyVehicles(updatedState.emergencyVehicles);
     }
   }, []);
 
@@ -91,6 +91,15 @@ const Index = () => {
       />
       
       <div className="container mx-auto py-6 px-4">
+        {/* Active Rides Tracker - shown regardless of mode if there are active bookings */}
+        <div className="mb-6">
+          <RideTracker 
+            bookings={bookings} 
+            rides={rides} 
+            currentUser={currentUser} 
+          />
+        </div>
+        
         {/* Mode-specific content */}
         {currentMode === 'rider' && (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -125,7 +134,7 @@ const Index = () => {
         {!currentMode && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="bg-white p-6 rounded-lg shadow-md">
-              <h2 className="text-2xl font-semibold mb-4">Welcome to ride with us</h2>
+              <h2 className="text-2xl font-semibold mb-4">Welcome to carpooling</h2>
               <p className="text-muted-foreground mb-4">
                 Choose a mode to get started:
               </p>
@@ -194,7 +203,6 @@ const Index = () => {
                 </div>
               </div>
               
-              {/* Animated car as a visual element */}
               <div className="mt-6 border-t pt-4 relative">
                 <div className="h-4 bg-muted rounded-full relative overflow-hidden">
                   <div className="absolute left-0 top-1/2 -translate-y-1/2 car-animation">

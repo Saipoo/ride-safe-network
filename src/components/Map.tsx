@@ -10,6 +10,7 @@ interface MapProps {
   startLocation?: Location;
   endLocation?: Location;
   waypoints?: Location[];
+  currentLocation?: Location | null;
   isEmergency?: boolean;
   className?: string;
 }
@@ -20,12 +21,15 @@ const Map: React.FC<MapProps> = ({
   startLocation,
   endLocation,
   waypoints = [],
+  currentLocation = null,
   isEmergency = false,
   className = '',
 }) => {
   const mapRef = useRef<HTMLDivElement>(null);
   const leafletMap = useRef<L.Map | null>(null);
-
+  const markersRef = useRef<L.Marker[]>([]);
+  const polylinesRef = useRef<L.Polyline[]>([]);
+  
   useEffect(() => {
     if (!mapRef.current) return;
 
@@ -41,12 +45,12 @@ const Map: React.FC<MapProps> = ({
 
     const map = leafletMap.current;
 
-    // Clean up markers
-    map.eachLayer((layer) => {
-      if (layer instanceof L.Marker || layer instanceof L.Polyline) {
-        map.removeLayer(layer);
-      }
-    });
+    // Clean up old markers and polylines
+    markersRef.current.forEach(marker => map.removeLayer(marker));
+    markersRef.current = [];
+    
+    polylinesRef.current.forEach(polyline => map.removeLayer(polyline));
+    polylinesRef.current = [];
 
     // Set start and end locations
     const start = ride?.startLocation || startLocation;
@@ -73,37 +77,66 @@ const Map: React.FC<MapProps> = ({
       iconSize: [24, 24],
       iconAnchor: [12, 12],
     });
+    
+    const currentLocationIcon = L.divIcon({
+      className: 'bg-blue-500 text-white rounded-full flex items-center justify-center',
+      html: '<div class="w-8 h-8 bg-blue-500 rounded-full border-2 border-white flex items-center justify-center pulse-animation">🚗</div>',
+      iconSize: [32, 32],
+      iconAnchor: [16, 16],
+    });
 
     // Add markers
     const markers = [];
     
     if (start) {
-      markers.push(L.marker([start.lat, start.lng], { icon: startIcon }).addTo(map)
-        .bindPopup(start.address));
+      const startMarker = L.marker([start.lat, start.lng], { icon: startIcon }).addTo(map)
+        .bindPopup(start.address);
+      markers.push(startMarker);
+      markersRef.current.push(startMarker);
     }
     
     if (end) {
-      markers.push(L.marker([end.lat, end.lng], { icon: endIcon }).addTo(map)
-        .bindPopup(end.address));
+      const endMarker = L.marker([end.lat, end.lng], { icon: endIcon }).addTo(map)
+        .bindPopup(end.address);
+      markers.push(endMarker);
+      markersRef.current.push(endMarker);
     }
+    
+    // Add waypoint markers
+    waypoints.forEach((wp, index) => {
+      const waypointIcon = L.divIcon({
+        className: 'bg-amber-500 text-white rounded-full flex items-center justify-center',
+        html: `<div class="w-6 h-6 bg-amber-500 rounded-full border-2 border-white flex items-center justify-center text-xs">${index + 1}</div>`,
+        iconSize: [24, 24],
+        iconAnchor: [12, 12],
+      });
+      
+      const waypointMarker = L.marker([wp.lat, wp.lng], { icon: waypointIcon }).addTo(map)
+        .bindPopup(wp.address);
+      markers.push(waypointMarker);
+      markersRef.current.push(waypointMarker);
+    });
 
     // Add emergency vehicle marker if provided
     if (emergencyVehicle && emergencyVehicle.status === 'active') {
-      markers.push(
-        L.marker(
-          [emergencyVehicle.currentLocation.lat, emergencyVehicle.currentLocation.lng],
-          { icon: emergencyIcon }
-        )
-          .addTo(map)
-          .bindPopup('Emergency Vehicle')
-      );
+      const emergencyMarker = L.marker(
+        [emergencyVehicle.currentLocation.lat, emergencyVehicle.currentLocation.lng],
+        { icon: emergencyIcon }
+      )
+        .addTo(map)
+        .bindPopup('Emergency Vehicle');
+      markers.push(emergencyMarker);
+      markersRef.current.push(emergencyMarker);
 
       // Add destination marker for emergency vehicle
-      markers.push(
-        L.marker([emergencyVehicle.destination.lat, emergencyVehicle.destination.lng], { icon: endIcon })
-          .addTo(map)
-          .bindPopup('Emergency Destination')
-      );
+      const emergencyDestMarker = L.marker(
+        [emergencyVehicle.destination.lat, emergencyVehicle.destination.lng],
+        { icon: endIcon }
+      )
+        .addTo(map)
+        .bindPopup('Emergency Destination');
+      markers.push(emergencyDestMarker);
+      markersRef.current.push(emergencyDestMarker);
 
       // Add route line for emergency
       const emergencyRoute = [
@@ -111,12 +144,24 @@ const Map: React.FC<MapProps> = ({
         [emergencyVehicle.destination.lat, emergencyVehicle.destination.lng]
       ];
       
-      L.polyline(emergencyRoute as L.LatLngExpression[], {
+      const emergencyPolyline = L.polyline(emergencyRoute as L.LatLngExpression[], {
         color: isEmergency ? '#F44336' : '#3366FF',
         weight: 4,
         opacity: 0.7,
         dashArray: isEmergency ? '10, 10' : '',
       }).addTo(map);
+      polylinesRef.current.push(emergencyPolyline);
+    }
+
+    // Add current location marker if provided (for live tracking)
+    if (currentLocation) {
+      const currentLocationMarker = L.marker(
+        [currentLocation.lat, currentLocation.lng],
+        { icon: currentLocationIcon }
+      )
+        .addTo(map);
+      markers.push(currentLocationMarker);
+      markersRef.current.push(currentLocationMarker);
     }
 
     // Draw route if both start and end are available
@@ -127,12 +172,13 @@ const Map: React.FC<MapProps> = ({
         [end.lat, end.lng],
       ];
       
-      L.polyline(routePoints as L.LatLngExpression[], {
+      const routePolyline = L.polyline(routePoints as L.LatLngExpression[], {
         color: isEmergency ? '#F44336' : '#3366FF',
         weight: 4,
         opacity: 0.7,
         dashArray: isEmergency ? '10, 10' : '',
       }).addTo(map);
+      polylinesRef.current.push(routePolyline);
     }
 
     // Fit map to show all markers
@@ -142,9 +188,9 @@ const Map: React.FC<MapProps> = ({
     }
 
     return () => {
-      // No need to destroy the map, just clean up markers
+      // No need to destroy the map, just clean up markers in the next render
     };
-  }, [ride, emergencyVehicle, startLocation, endLocation, waypoints, isEmergency]);
+  }, [ride, emergencyVehicle, startLocation, endLocation, waypoints, currentLocation, isEmergency]);
 
   return <div ref={mapRef} className={`h-[400px] rounded-lg ${className}`}></div>;
 };
