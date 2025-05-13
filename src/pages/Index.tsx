@@ -34,7 +34,7 @@ const Index = () => {
       setCurrentMode(appState.currentMode);
       setRides(appState.rides);
       setBookings(appState.bookings);
-      setEmergencyVehicles(updatedState.emergencyVehicles);
+      setEmergencyVehicles(appState.emergencyVehicles);
     }
   }, []);
 
