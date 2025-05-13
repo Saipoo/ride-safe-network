@@ -134,7 +134,7 @@ const Index = () => {
         {!currentMode && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="bg-white p-6 rounded-lg shadow-md">
-              <h2 className="text-2xl font-semibold mb-4">Welcome to carpooling</h2>
+              <h2 className="text-2xl font-semibold mb-4">Welcome to Ride with Us</h2>
               <p className="text-muted-foreground mb-4">
                 Choose a mode to get started:
               </p>

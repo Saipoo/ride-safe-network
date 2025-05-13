@@ -38,7 +38,7 @@ const AppHeader: React.FC<AppHeaderProps> = ({ currentMode, onModeChange, onLogo
           <div className="h-8 w-8 bg-primary rounded-full flex items-center justify-center">
             <Users className="h-5 w-5 text-white" />
           </div>
-          <h1 className="text-xl font-bold text-primary">carpooling</h1>
+          <h1 className="text-xl font-bold text-primary">Ride with Us</h1>
         </div>
         
         <div className="flex items-center gap-4">
