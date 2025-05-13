@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -25,24 +26,36 @@ export default {
 				background: 'hsl(var(--background))',
 				foreground: 'hsl(var(--foreground))',
 				primary: {
-					DEFAULT: 'hsl(var(--primary))',
-					foreground: 'hsl(var(--primary-foreground))'
+					DEFAULT: '#3366FF',
+					foreground: '#FFFFFF',
+					light: '#E6EDFF',
+					dark: '#1A3AA8',
 				},
 				secondary: {
-					DEFAULT: 'hsl(var(--secondary))',
-					foreground: 'hsl(var(--secondary-foreground))'
+					DEFAULT: '#FF6633',
+					foreground: '#FFFFFF',
+					light: '#FFECE6',
+					dark: '#CC4D26',
 				},
-				destructive: {
-					DEFAULT: 'hsl(var(--destructive))',
-					foreground: 'hsl(var(--destructive-foreground))'
+				success: {
+					DEFAULT: '#4CAF50',
+					foreground: '#FFFFFF',
+				},
+				warning: {
+					DEFAULT: '#F44336',
+					foreground: '#FFFFFF',
 				},
 				muted: {
-					DEFAULT: 'hsl(var(--muted))',
-					foreground: 'hsl(var(--muted-foreground))'
+					DEFAULT: '#F5F7FA',
+					foreground: '#64748B',
 				},
 				accent: {
 					DEFAULT: 'hsl(var(--accent))',
 					foreground: 'hsl(var(--accent-foreground))'
+				},
+				destructive: {
+					DEFAULT: 'hsl(var(--destructive))',
+					foreground: 'hsl(var(--destructive-foreground))'
 				},
 				popover: {
 					DEFAULT: 'hsl(var(--popover))',
@@ -84,11 +97,24 @@ export default {
 					to: {
 						height: '0'
 					}
-				}
+				},
+				'pulse-ring': {
+					'0%': { transform: 'scale(0.7)', opacity: '0.8' },
+					'80%, 100%': { transform: 'scale(1.5)', opacity: '0' }
+				},
+				'car-move': {
+					'0%': { transform: 'translateX(0) rotate(0deg)' },
+					'25%': { transform: 'translateX(25%) rotate(5deg)' },
+					'50%': { transform: 'translateX(50%) rotate(-5deg)' },
+					'75%': { transform: 'translateX(75%) rotate(5deg)' },
+					'100%': { transform: 'translateX(90%) rotate(0deg)' }
+				},
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
-				'accordion-up': 'accordion-up 0.2s ease-out'
+				'accordion-up': 'accordion-up 0.2s ease-out',
+				'pulse-ring': 'pulse-ring 1.25s cubic-bezier(0.24, 0, 0.38, 1) infinite',
+				'car-move': 'car-move 5s linear infinite',
 			}
 		}
 	},
