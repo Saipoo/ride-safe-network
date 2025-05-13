@@ -23,12 +23,12 @@ const Index = () => {
     const appState = initializeAppState();
     if (!appState.rides.length) {
       generateMockData();
-      const updatedState = initializeAppState();
-      setCurrentUser(updatedState.currentUser);
-      setCurrentMode(updatedState.currentMode);
-      setRides(updatedState.rides);
-      setBookings(updatedState.bookings);
-      setEmergencyVehicles(updatedState.emergencyVehicles);
+      const newAppState = initializeAppState();
+      setCurrentUser(newAppState.currentUser);
+      setCurrentMode(newAppState.currentMode);
+      setRides(newAppState.rides);
+      setBookings(newAppState.bookings);
+      setEmergencyVehicles(newAppState.emergencyVehicles);
     } else {
       setCurrentUser(appState.currentUser);
       setCurrentMode(appState.currentMode);
